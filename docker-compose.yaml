@@ -1,0 +1,14 @@
+version: '3.1'
+services:
+  spring-data-mongo-db:
+    container_name: pokedex-mongo-db
+    image: mongo
+    restart: always
+    ports:
+      - 27017:27017
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: root
+      MONGO_INITDB_DATABASE: pokedex_db
+    volumes:
+      - $HOME/mongo_data
