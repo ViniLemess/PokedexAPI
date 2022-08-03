@@ -11,6 +11,6 @@ server:
 spring:
   data:
     mongodb:
-      password: root
-      username: root
+      username: ${MONGODB_USERNAME}
+      password: ${MONGODB_PASSWORD}
       authentication-database: admin
