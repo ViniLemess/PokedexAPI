@@ -4,7 +4,7 @@ import com.fundatec.vinilemess.pokedex.domain.entity.Pokemon;
 
 public interface IPokemonService {
 
-    Pokemon getPokemonById(Long id);
+    Pokemon getPokemonById(Integer id);
     Pokemon getPokemonByName(String name);
 
     Pokemon registerPokemon(Pokemon pokemon);

@@ -7,9 +7,9 @@ import java.util.Optional;
 
 public interface PokemonRepository extends MongoRepository<Pokemon, String> {
 
-    Optional<Pokemon> findPokemonByName(String name);
+    Optional<Pokemon> findPokemonByNameAndDeletedFalse(String name);
 
-    Optional<Pokemon> findPokemonByPokedexId(Long id);
+    Optional<Pokemon> findPokemonByPokedexIdAndDeletedFalse(Integer id);
 
     int countPokemonByNameOrPokedexId(String name, Integer id);
 

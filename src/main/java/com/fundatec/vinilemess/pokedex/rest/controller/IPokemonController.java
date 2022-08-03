@@ -5,7 +5,7 @@ import org.springframework.http.ResponseEntity;
 
 public interface IPokemonController {
 
-    ResponseEntity<Pokemon> getPokemonById(Long id);
+    ResponseEntity<Pokemon> getPokemonById(Integer id);
     ResponseEntity<Pokemon> getPokemonByName(String name);
     ResponseEntity<Iterable<Pokemon>> getHeavyPokemons();
     void registerPokemon(Pokemon pokemon);

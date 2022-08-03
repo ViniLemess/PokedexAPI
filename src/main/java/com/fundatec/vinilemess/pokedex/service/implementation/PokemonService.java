@@ -25,11 +25,11 @@ public class PokemonService implements IPokemonService {
     }
 
     @Override
-    public Pokemon getPokemonById(Long id) {
+    public Pokemon getPokemonById(Integer id) {
         try {
             return toEntity(pokemonIntegrationService.getPokemonResponseById(id));
         } catch (PokemonNotFoundException exception) {
-            return repository.findPokemonByPokedexId(id).orElseThrow(() -> new PokemonNotFoundException("Pokemon " + id));
+            return repository.findPokemonByPokedexIdAndDeletedFalse(id).orElseThrow(() -> new PokemonNotFoundException("Pokemon " + id));
         }
     }
 
@@ -38,7 +38,7 @@ public class PokemonService implements IPokemonService {
         try {
             return toEntity(pokemonIntegrationService.getPokemonResponseByName(name));
         } catch (PokemonNotFoundException exception) {
-            return repository.findPokemonByName(name).orElseThrow(() -> new PokemonNotFoundException("Pokemon " + name));
+            return repository.findPokemonByNameAndDeletedFalse(name).orElseThrow(() -> new PokemonNotFoundException("Pokemon " + name));
         }
     }
 

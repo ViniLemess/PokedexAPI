@@ -21,7 +21,7 @@ public class PokemonIntegrationService implements IPokemonIntegrationService {
                 .build();
     }
 
-    public PokemonResponse getPokemonResponseById(Long id) {
+    public PokemonResponse getPokemonResponseById(Integer id) {
         String uri = generateURLIntegration(id);
         return restTemplate.getForObject(uri, PokemonResponse.class);
     }
@@ -41,7 +41,7 @@ public class PokemonIntegrationService implements IPokemonIntegrationService {
         }
     }
 
-    private String generateURLIntegration(Long id) {
+    private String generateURLIntegration(Integer id) {
         return this.pokeApiUri + "/" + id;
     }
     private String generateURLIntegration(String name) {

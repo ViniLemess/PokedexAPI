@@ -22,7 +22,7 @@ public class PokemonController implements IPokemonController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Pokemon> getPokemonById(@PathVariable("id") Long id) {
+    public ResponseEntity<Pokemon> getPokemonById(@PathVariable("id") Integer id) {
         return ResponseEntity.ok(pokemonService.getPokemonById(id));
     }
 

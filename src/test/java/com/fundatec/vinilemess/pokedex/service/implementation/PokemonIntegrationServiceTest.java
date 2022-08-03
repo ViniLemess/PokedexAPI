@@ -7,9 +7,4 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class PokemonIntegrationServiceTest {
 
-    @Test
-    void mustValidatePokemonExistenceByNameSuccessfully() {
-        PokemonIntegrationService service = new PokemonIntegrationService(new RestTemplateBuilder());
-        assertTrue(service.validatePokemonExistenceByName("pikachu"));
-    }
 }

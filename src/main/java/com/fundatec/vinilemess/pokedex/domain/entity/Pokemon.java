@@ -4,6 +4,7 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import javax.validation.constraints.*;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Document
@@ -33,6 +34,8 @@ public class Pokemon {
     @NotEmpty
     @Size(max = 2)
     private List<Type> types;
+
+    private boolean deleted = false;
 
     public Pokemon(Integer pokedexId, String name, Integer weight, Integer height, List<Move> moves, List<Type> types) {
         this.pokedexId = pokedexId;
@@ -67,5 +70,9 @@ public class Pokemon {
 
     public List<Type> getTypes() {
         return types;
+    }
+
+    public boolean isDeleted() {
+        return deleted;
     }
 }
