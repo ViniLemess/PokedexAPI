@@ -1,4 +1,4 @@
-package com.fundatec.vinilemess.pokedex.domain.entity;
+package com.fundatec.vinilemess.pokedex.domain;
 
 import javax.validation.constraints.NotBlank;
 
