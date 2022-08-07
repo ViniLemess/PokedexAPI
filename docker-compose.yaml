@@ -4,11 +4,22 @@ services:
     container_name: pokedex-mongo-db
     image: mongo
     restart: always
-    ports:
-      - 27017:27017
     environment:
-      MONGO_INITDB_ROOT_USERNAME: "${MONGODB_USERNAME}"
-      MONGO_INITDB_ROOT_PASSWORD: "${MONGODB_PASSWORD}"
+      MONGO_INITDB_ROOT_USERNAME: ${MONGODB_USERNAME}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGODB_PASSWORD}
       MONGO_INITDB_DATABASE: pokedex_db
     volumes:
-      - ${HOME}/mongo_data
+      - "${HOME}/mongo_data:/data/db"
+
+  pokedex-api-service:
+    container_name: pokedex-api
+    build:
+      context: ./
+      dockerfile: Dockerfile
+      args:
+        MONGO_USERNAME: ${MONGODB_USERNAME}
+        MONGO_PASSWORD: ${MONGODB_PASSWORD}
+    ports:
+      - "8081:8081"
+    depends_on:
+      - spring-data-mongo-db
