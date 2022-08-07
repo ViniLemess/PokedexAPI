@@ -33,10 +33,9 @@ public class ExceptionHandlerAdvice implements ResponseErrorHandler {
 
     @Override
     public void handleError(ClientHttpResponse response) throws IOException {
-        if (response.getStatusCode().series() == CLIENT_ERROR) {
-            if (response.getStatusCode() == HttpStatus.NOT_FOUND)
-                throw new PokemonNotFoundException(response.getBody().toString());
-        }
+        if (response.getStatusCode().series() == CLIENT_ERROR
+                && response.getStatusCode() == HttpStatus.NOT_FOUND)
+                    throw new PokemonNotFoundException("Pokemon");
     }
 
     @ExceptionHandler(PokemonNotFoundException.class)
