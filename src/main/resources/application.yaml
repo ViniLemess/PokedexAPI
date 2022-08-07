@@ -3,14 +3,13 @@ server:
   port: 8081
   servlet:
     context-path: /api/v1
-  data:
-    mongodb:
-      host: localhost
-      port: 27017
-      database: pokedex_db
+
 spring:
   data:
     mongodb:
       username: ${MONGODB_USERNAME}
       password: ${MONGODB_PASSWORD}
       authentication-database: admin
+      host: spring-data-mongo-db
+      port: 27017
+      database: pokedex_db
