@@ -1,14 +1,16 @@
 package com.fundatec.vinilemess.pokedex.rest.controller;
 
-import com.fundatec.vinilemess.pokedex.domain.entity.Pokemon;
+import com.fundatec.vinilemess.pokedex.service.dto.PokemonDTO;
 import org.springframework.http.ResponseEntity;
+
+import java.util.List;
 
 public interface IPokemonController {
 
-    ResponseEntity<Pokemon> getPokemonById(Integer id);
-    ResponseEntity<Pokemon> getPokemonByName(String name);
-    ResponseEntity<Iterable<Pokemon>> getHeavyPokemons();
-    void registerPokemon(Pokemon pokemon);
+    ResponseEntity<PokemonDTO> getPokemonById(Integer id);
+    ResponseEntity<PokemonDTO> getPokemonByName(String name);
+    ResponseEntity<List<PokemonDTO>> getPokemonsByWeight(Integer weight);
+    void registerPokemon(PokemonDTO pokemon);
     void deletePokemon(String name);
-    void updatePokemon(Pokemon pokemon);
+    void updatePokemon(PokemonDTO pokemon);
 }

@@ -1,14 +1,15 @@
 package com.fundatec.vinilemess.pokedex.rest.controller.impl;
 
-import com.fundatec.vinilemess.pokedex.domain.entity.Pokemon;
 import com.fundatec.vinilemess.pokedex.rest.controller.IPokemonController;
 import com.fundatec.vinilemess.pokedex.service.IPokemonService;
+import com.fundatec.vinilemess.pokedex.service.dto.PokemonDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.util.List;
 
 @RestController
 @RequestMapping("/pokemon")
@@ -22,33 +23,33 @@ public class PokemonController implements IPokemonController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Pokemon> getPokemonById(@PathVariable("id") Integer id) {
+    public ResponseEntity<PokemonDTO> getPokemonById(@PathVariable("id") Integer id) {
         return ResponseEntity.ok(pokemonService.getPokemonById(id));
     }
 
     @GetMapping("/name/{name}")
-    public ResponseEntity<Pokemon> getPokemonByName(@PathVariable("name") String name) {
+    public ResponseEntity<PokemonDTO> getPokemonByName(@PathVariable("name") String name) {
         return ResponseEntity.ok(pokemonService.getPokemonByName(name));
     }
 
-    @Override
-    public ResponseEntity<Iterable<Pokemon>> getHeavyPokemons() {
-        return null;
+    @GetMapping("/filter")
+    public ResponseEntity<List<PokemonDTO>> getPokemonsByWeight(@RequestParam("weight") Integer weight) {
+        return ResponseEntity.ok(pokemonService.getPokemonsByWeight(weight));
     }
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public void registerPokemon(@RequestBody @Valid Pokemon pokemon) {
+    public void registerPokemon(@RequestBody @Valid PokemonDTO pokemon) {
         pokemonService.registerPokemon(pokemon);
     }
 
-    @DeleteMapping
-    public void deletePokemon(String name) {
+    @DeleteMapping("/{name}")
+    public void deletePokemon(@PathVariable("name") String name) {
         pokemonService.deletePokemon(name);
     }
 
     @PutMapping
-    public void updatePokemon(Pokemon pokemon) {
+    public void updatePokemon(@RequestBody @Valid PokemonDTO pokemon) {
         pokemonService.updatePokemon(pokemon);
     }
 }
