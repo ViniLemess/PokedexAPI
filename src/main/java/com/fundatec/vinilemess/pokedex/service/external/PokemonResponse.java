@@ -11,7 +11,7 @@ public class PokemonResponse {
     private List<MoveResponse> moves;
     private List<TypeResponse> types;
 
-    PokemonResponse(){}
+    public PokemonResponse(){}
 
     public PokemonResponse(Integer id, String name, Integer height, Integer weight, List<MoveResponse> moves, List<TypeResponse> types) {
         this.id = id;
