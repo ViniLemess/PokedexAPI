@@ -1,8 +1,9 @@
 package com.fundatec.vinilemess.pokedex.infra.repository;
 
-import com.fundatec.vinilemess.pokedex.domain.entity.Pokemon;
+import com.fundatec.vinilemess.pokedex.domain.Pokemon;
 import org.springframework.data.mongodb.repository.MongoRepository;
 
+import java.util.List;
 import java.util.Optional;
 
 public interface PokemonRepository extends MongoRepository<Pokemon, String> {
@@ -11,6 +12,8 @@ public interface PokemonRepository extends MongoRepository<Pokemon, String> {
 
     Optional<Pokemon> findPokemonByPokedexIdAndDeletedFalse(Integer id);
 
-    int countPokemonByNameOrPokedexId(String name, Integer id);
+    int countPokemonByNameAndDeletedFalseOrPokedexIdAndDeletedFalse(String name, Integer id);
+
+    List<Pokemon> findPokemonsByWeightGreaterThanAndDeletedFalse(Integer weight);
 
 }
