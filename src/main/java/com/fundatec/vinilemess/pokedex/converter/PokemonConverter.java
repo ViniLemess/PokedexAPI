@@ -16,8 +16,8 @@ public class PokemonConverter {
         return new PokemonDTO(
                 response.getId(),
                 response.getName(),
-                response.getHeight(),
                 response.getWeight(),
+                response.getHeight(),
                 response.getMoves()
                         .stream()
                         .map(move -> new MoveDTO(move.getMove().getName()))
