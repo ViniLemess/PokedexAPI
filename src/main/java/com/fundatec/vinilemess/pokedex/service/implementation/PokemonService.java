@@ -80,7 +80,9 @@ public class PokemonService implements IPokemonService {
     }
 
     private Pokemon generateUpdatedPokemon(PokemonDTO pokemonDto) {
-        var presentPokemon = repository.findPokemonByNameAndDeletedFalse(pokemonDto.getName()).orElseThrow(() -> new PokemonNotFoundException("Pokemon " + pokemonDto.getName()));
+        var presentPokemon = repository
+                .findPokemonByNameAndDeletedFalse(pokemonDto.getName()).orElseThrow(() ->
+                        new PokemonNotFoundException("Pokemon " + pokemonDto.getName()));
         return new Pokemon(
                 presentPokemon.getId(),
                 presentPokemon.getPokedexId(),
