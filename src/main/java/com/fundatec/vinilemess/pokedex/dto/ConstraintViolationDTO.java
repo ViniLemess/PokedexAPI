@@ -5,7 +5,7 @@ import lombok.Getter;
 
 @AllArgsConstructor
 @Getter
-public class ConstraintViolationError {
+public class ConstraintViolationDTO {
     private String field;
     private String message;
 }

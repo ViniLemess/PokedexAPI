@@ -1,6 +1,6 @@
 package com.fundatec.vinilemess.pokedex.infra.repository;
 
-import com.fundatec.vinilemess.pokedex.domain.Pokemon;
+import com.fundatec.vinilemess.pokedex.entity.Pokemon;
 import org.springframework.data.mongodb.repository.MongoRepository;
 
 import java.util.List;

@@ -1,9 +1,13 @@
 package com.fundatec.vinilemess.pokedex.rest.controller.impl;
 
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.condition.DisabledOnJre;
+import org.junit.jupiter.api.condition.JRE;
 
 import static io.restassured.RestAssured.*;
 import static org.hamcrest.Matchers.*;
+
+@DisabledOnJre(JRE.JAVA_17)
 
 class HealthCheckerControllerTest {
 

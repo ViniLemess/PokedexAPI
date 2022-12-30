@@ -5,18 +5,18 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import java.time.LocalDateTime;
 import java.util.List;
 
-public class ConstraintViolationsDTO {
+public class ConstraintViolationResponse {
 
-    private List<ConstraintViolationError> errors;
+    private List<ConstraintViolationDTO> errors;
 
     private LocalDateTime timestamp;
 
-    public ConstraintViolationsDTO(List<ConstraintViolationError> errors) {
+    public ConstraintViolationResponse(List<ConstraintViolationDTO> errors) {
         this.errors = errors;
         this.timestamp = LocalDateTime.now();
     }
 
-    public List<ConstraintViolationError> getErrors() {
+    public List<ConstraintViolationDTO> getErrors() {
         return this.errors;
     }
 

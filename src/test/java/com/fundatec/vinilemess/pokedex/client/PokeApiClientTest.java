@@ -1,7 +1,8 @@
 package com.fundatec.vinilemess.pokedex.service.implementation;
 
+import com.fundatec.vinilemess.pokedex.client.PokemonIntegrationService;
 import com.fundatec.vinilemess.pokedex.exception.PokemonNotFoundException;
-import com.fundatec.vinilemess.pokedex.service.external.PokemonResponse;
+import com.fundatec.vinilemess.pokedex.dto.response.PokemonResponse;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;

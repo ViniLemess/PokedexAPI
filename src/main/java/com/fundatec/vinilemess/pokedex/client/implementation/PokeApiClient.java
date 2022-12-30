@@ -1,21 +1,21 @@
-package com.fundatec.vinilemess.pokedex.service.implementation;
+package com.fundatec.vinilemess.pokedex.client;
 
 import com.fundatec.vinilemess.pokedex.rest.handler.ExceptionHandlerAdvice;
 import com.fundatec.vinilemess.pokedex.service.IPokemonIntegrationService;
-import com.fundatec.vinilemess.pokedex.service.external.PokemonResponse;
+import com.fundatec.vinilemess.pokedex.dto.response.PokemonResponse;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
 @Service
-public class PokemonIntegrationService implements IPokemonIntegrationService {
+public class PokeApiClient implements IPokemonIntegrationService {
 
     @Value("${poke-api-uri}")
     private String pokeApiUri;
     private final RestTemplate restTemplate;
 
-    public PokemonIntegrationService(RestTemplateBuilder restTemplateBuilder) {
+    public PokeApiClient(RestTemplateBuilder restTemplateBuilder) {
         this.restTemplate = restTemplateBuilder
                 .errorHandler(new ExceptionHandlerAdvice())
                 .build();
