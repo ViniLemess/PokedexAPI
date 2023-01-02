@@ -19,7 +19,7 @@ dependencies {
 	implementation "org.springframework.cloud:spring-cloud-starter-openfeign"
 	implementation "io.github.openfeign:feign-jackson:12.1"
 	implementation 'org.projectlombok:lombok:1.18.24'
-	implementation 'org.springdoc:springdoc-openapi-ui:1.1.49'
+	implementation 'org.springdoc:springdoc-openapi-ui:1.6.14'
 	annotationProcessor 'org.projectlombok:lombok:1.18.24'
 	testImplementation 'org.hamcrest:hamcrest:2.2'
 	testImplementation 'io.rest-assured:rest-assured:3.3.0'
