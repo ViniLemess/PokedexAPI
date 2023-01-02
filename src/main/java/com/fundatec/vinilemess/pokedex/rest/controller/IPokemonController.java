@@ -17,7 +17,7 @@ public interface IPokemonController {
                       required = true,
                       example = "1") Integer id);
 
-    @ApiOperation(value = "GET pokemon by id", notes = "Return pokemon by the given name")
+    @ApiOperation(value = "GET pokemon by name", notes = "Return pokemon by the given name")
     ResponseEntity<PokemonResponse> getPokemonByName(
             @ApiParam(type = "String",
                     value = "Name of the desired pokemon",
