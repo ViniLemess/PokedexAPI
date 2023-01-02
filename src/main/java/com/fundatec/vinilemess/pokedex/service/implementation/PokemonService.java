@@ -16,6 +16,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
+import java.util.function.Function;
+import java.util.function.Supplier;
 
 import static com.fundatec.vinilemess.pokedex.mapper.PokemonMapper.requestToEntity;
 
@@ -57,8 +60,10 @@ public class PokemonService implements IPokemonService {
     @Override
     public Pokemon registerPokemon(PokemonRequest pokemonRequest) {
         Pokemon pokemon = requestToEntity(pokemonRequest);
-        validatePokemonDuplicated(pokemon);
-        return repository.save(pokemon);
+
+        return repository.save(findDeletedPokemon(pokemon)
+                .map(mapToRestoredPokemon())
+                .orElseGet(saveNewPokemon(pokemon)));
     }
 
     @Override
@@ -74,6 +79,21 @@ public class PokemonService implements IPokemonService {
     public void updatePokemon(PokemonRequest pokemonRequest) {
         validateCanonicalPokemon(pokemonRequest.getName());
         repository.save(generateUpdatedPokemon(pokemonRequest));
+    }
+
+    private Function<Pokemon, Pokemon> mapToRestoredPokemon() {
+        return restoredPokemon -> {
+            restoredPokemon.restorePokemon();
+            return restoredPokemon;
+        };
+    }
+
+    private Supplier<Pokemon> saveNewPokemon(Pokemon pokemon) {
+        validatePokemonDuplicated(pokemon);
+        return () -> repository.save(pokemon);
+    }
+    private Optional<Pokemon> findDeletedPokemon(Pokemon pokemon) {
+        return repository.findPokemonByNameAndPokedexIdAndDeletedTrue(pokemon.getName(), pokemon.getPokedexId());
     }
 
     private Pokemon generateUpdatedPokemon(PokemonRequest pokemonRequest) {

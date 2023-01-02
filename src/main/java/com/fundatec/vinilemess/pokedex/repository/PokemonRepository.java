@@ -14,6 +14,8 @@ public interface PokemonRepository extends MongoRepository<Pokemon, String> {
 
     int countPokemonByNameAndDeletedFalseOrPokedexIdAndDeletedFalse(String name, Integer id);
 
+    Optional<Pokemon> findPokemonByNameAndPokedexIdAndDeletedTrue(String name, Integer id);
+
     List<Pokemon> findPokemonsByWeightGreaterThanAndDeletedFalse(Integer weight);
 
 }

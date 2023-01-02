@@ -34,4 +34,8 @@ public class Pokemon {
     public void markDeleted() {
         this.deleted = true;
     }
+
+    public void restorePokemon() {
+        this.deleted = false;
+    }
 }
