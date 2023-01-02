@@ -1,4 +1,4 @@
-package com.fundatec.vinilemess.pokedex.rest.controller.impl;
+package com.fundatec.vinilemess.pokedex.rest.controller.implementation;
 
 import com.fundatec.vinilemess.pokedex.rest.controller.IHealthCheckerController;
 import org.springframework.http.ResponseEntity;

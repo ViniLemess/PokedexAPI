@@ -1,48 +1,39 @@
-package com.fundatec.vinilemess.pokedex.service.external;
+package com.fundatec.vinilemess.pokedex.dto.response;
+
+import com.fasterxml.jackson.annotation.JsonProperty;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 import java.util.List;
 
+@AllArgsConstructor
+@NoArgsConstructor
+@Getter
+
 public class PokemonResponse {
 
+    @JsonProperty("id")
     private Integer id;
+
+    @JsonProperty("name")
+
     private String name;
+
+    @JsonProperty("height")
+
     private Integer height;
+
+    @JsonProperty("weight")
+
     private Integer weight;
+
+    @JsonProperty("moves")
+
     private List<MoveResponse> moves;
+
+    @JsonProperty("types")
+
     private List<TypeResponse> types;
 
-    public PokemonResponse(){}
-
-    public PokemonResponse(Integer id, String name, Integer height, Integer weight, List<MoveResponse> moves, List<TypeResponse> types) {
-        this.id = id;
-        this.name = name;
-        this.height = height;
-        this.weight = weight;
-        this.moves = moves;
-        this.types = types;
-    }
-
-    public Integer getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public Integer getHeight() {
-        return height;
-    }
-
-    public Integer getWeight() {
-        return weight;
-    }
-
-    public List<MoveResponse> getMoves() {
-        return moves;
-    }
-
-    public List<TypeResponse> getTypes() {
-        return types;
-    }
 }

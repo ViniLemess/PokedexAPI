@@ -1,52 +1,36 @@
-package com.fundatec.vinilemess.pokedex.converter;
+package com.fundatec.vinilemess.pokedex.mapper;
 
-import com.fundatec.vinilemess.pokedex.entity.Move;
-import com.fundatec.vinilemess.pokedex.entity.Pokemon;
-import com.fundatec.vinilemess.pokedex.entity.Type;
 import com.fundatec.vinilemess.pokedex.dto.request.MoveRequest;
 import com.fundatec.vinilemess.pokedex.dto.request.PokemonRequest;
 import com.fundatec.vinilemess.pokedex.dto.request.TypeRequest;
-import com.fundatec.vinilemess.pokedex.dto.response.MoveResponse;
 import com.fundatec.vinilemess.pokedex.dto.response.PokemonResponse;
-import com.fundatec.vinilemess.pokedex.dto.response.TypeResponse;
+import com.fundatec.vinilemess.pokedex.entity.Move;
+import com.fundatec.vinilemess.pokedex.entity.Pokemon;
+import com.fundatec.vinilemess.pokedex.entity.Type;
 import org.junit.jupiter.api.Test;
 
-import java.util.Arrays;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 
-class PokemonConverterTest {
+class PokemonMapperTest {
 
     @Test
-    void mustConvertFromResponseToDtoSuccessfully() {
-        var pokemonResponse = new PokemonResponse(
-                1,
-                "Testemon",
-                4,
-                40,
-                Arrays.asList(new MoveResponse("TestAtack")),
-                Arrays.asList(new TypeResponse(1, "Flying"))
-        );
-        assertInstanceOf(PokemonRequest.class, PokemonConverter.responseToDto(pokemonResponse));
+    void mustMapFromEntityToResponseSuccessfully() {
+        var pokemon = Pokemon.builder()
+                .id(null)
+                .pokedexId(1)
+                .name("Testemon")
+                .height(4)
+                .weight(40)
+                .moves(List.of(new Move("TestAtack")))
+                .types(List.of(new Type(1, "Flying")))
+                .build();
+        assertInstanceOf(PokemonResponse.class, PokemonMapper.entityToResponse(pokemon));
     }
 
     @Test
-    void mustConvertFromEntityToDtoSuccessfully() {
-        var pokemon = new Pokemon(
-                null,
-                1,
-                "Testemon",
-                4,
-                40,
-                List.of(new Move("TestAtack")),
-                List.of(new Type(1, "Flying"))
-        );
-        assertInstanceOf(PokemonRequest.class, PokemonConverter.entityToDto(pokemon));
-    }
-
-    @Test
-    void mustConvertFromDtoToEntitySuccessfully() {
+    void mustMapFromRequestToEntitySuccessfully() {
         var pokemonDTO = new PokemonRequest(
                 1,
                 "Testemon",
@@ -55,6 +39,6 @@ class PokemonConverterTest {
                 List.of(new MoveRequest("TestAtack")),
                 List.of(new TypeRequest(1, "Flying"))
         );
-        assertInstanceOf(Pokemon.class, PokemonConverter.dtoToEntity(pokemonDTO));
+        assertInstanceOf(Pokemon.class, PokemonMapper.requestToEntity(pokemonDTO));
     }
 }

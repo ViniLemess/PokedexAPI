@@ -1,20 +1,21 @@
 package com.fundatec.vinilemess.pokedex.service;
 
-import com.fundatec.vinilemess.pokedex.domain.Pokemon;
-import com.fundatec.vinilemess.pokedex.service.dto.PokemonDTO;
+import com.fundatec.vinilemess.pokedex.dto.response.PokemonResponse;
+import com.fundatec.vinilemess.pokedex.entity.Pokemon;
+import com.fundatec.vinilemess.pokedex.dto.request.PokemonRequest;
 
 import java.util.List;
 
 public interface IPokemonService {
 
-    PokemonDTO getPokemonById(Integer id);
-    PokemonDTO getPokemonByName(String name);
+    PokemonResponse getPokemonById(Integer id);
+    PokemonResponse getPokemonByName(String name);
 
-    List<PokemonDTO> getPokemonsByWeight(Integer weight);
+    List<PokemonResponse> getPokemonsByWeight(Integer weight);
 
-    Pokemon registerPokemon(PokemonDTO pokemon);
+    Pokemon registerPokemon(PokemonRequest pokemon);
 
     void deletePokemon(String name);
 
-    void updatePokemon(PokemonDTO pokemon);
+    void updatePokemon(PokemonRequest pokemon);
 }

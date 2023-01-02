@@ -1,66 +1,32 @@
-package com.fundatec.vinilemess.pokedex.converter;
+package com.fundatec.vinilemess.pokedex.mapper;
 
-import com.fundatec.vinilemess.pokedex.entity.Move;
-import com.fundatec.vinilemess.pokedex.entity.Pokemon;
-import com.fundatec.vinilemess.pokedex.entity.Type;
-import com.fundatec.vinilemess.pokedex.dto.request.MoveRequest;
 import com.fundatec.vinilemess.pokedex.dto.request.PokemonRequest;
-import com.fundatec.vinilemess.pokedex.dto.request.TypeRequest;
 import com.fundatec.vinilemess.pokedex.dto.response.PokemonResponse;
+import com.fundatec.vinilemess.pokedex.entity.Pokemon;
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 
-public class PokemonConverter {
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
+public class PokemonMapper {
 
-    private PokemonConverter(){}
-
-    public static PokemonRequest responseToDto(PokemonResponse response) {
-        return new PokemonRequest(
-                response.getId(),
-                response.getName(),
-                response.getWeight(),
-                response.getHeight(),
-                response.getMoves()
-                        .stream()
-                        .map(move -> new MoveRequest(move.getMove().getName()))
-                        .toList(),
-                response.getTypes()
-                        .stream()
-                        .map(type -> new TypeRequest(type.getSlot(), type.getType().getName()))
-                        .toList()
-        );
-    }
-
-    public static PokemonRequest entityToDto(Pokemon pokemon) {
-        return new PokemonRequest(
+    public static PokemonResponse entityToResponse(Pokemon pokemon) {
+        return new PokemonResponse(
                 pokemon.getPokedexId(),
                 pokemon.getName(),
                 pokemon.getWeight(),
                 pokemon.getHeight(),
-                pokemon.getMoves()
-                        .stream()
-                        .map(move -> new MoveRequest(move.getName()))
-                        .toList(),
-                pokemon.getTypes()
-                        .stream()
-                        .map(type -> new TypeRequest(type.getSlot(), type.getName()))
-                        .toList()
-        );
+                MoveMapper.entitiesToResponses(pokemon.getMoves()),
+                TypeMapper.entitiesToResponses(pokemon.getTypes()));
     }
 
-    public static Pokemon dtoToEntity(PokemonRequest pokemonRequest) {
-        return new Pokemon(
-                null,
-                pokemonRequest.getPokedexId(),
-                pokemonRequest.getName(),
-                pokemonRequest.getWeight(),
-                pokemonRequest.getHeight(),
-                pokemonRequest.getMoves()
-                        .stream()
-                        .map(moveRequest -> new Move(moveRequest.getName()))
-                        .toList(),
-                pokemonRequest.getTypes()
-                        .stream()
-                        .map(typeRequest -> new Type(typeRequest.getSlot(), typeRequest.getName()))
-                        .toList()
-        );
+    public static Pokemon requestToEntity(PokemonRequest pokemonRequest) {
+        return Pokemon.builder()
+                .pokedexId(pokemonRequest.getPokedexId())
+                .name(pokemonRequest.getName())
+                .weight(pokemonRequest.getWeight())
+                .height(pokemonRequest.getHeight())
+                .moves(MoveMapper.requestsToEntities(pokemonRequest.getMoves()))
+                .types(TypeMapper.requestsToEntities(pokemonRequest.getTypes()))
+                .build();
     }
 }

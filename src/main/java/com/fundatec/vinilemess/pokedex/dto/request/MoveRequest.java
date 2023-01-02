@@ -1,18 +1,18 @@
-package com.fundatec.vinilemess.pokedex.service.dto;
+package com.fundatec.vinilemess.pokedex.dto.request;
 
 import lombok.Getter;
 
 import javax.validation.constraints.NotBlank;
 
 @Getter
-public class MoveDTO {
+public class MoveRequest {
 
     @NotBlank
     private String name;
 
-    public MoveDTO() {}
+    public MoveRequest() {}
 
-    public MoveDTO(String name) {
+    public MoveRequest(String name) {
         this.name = name;
     }
 }

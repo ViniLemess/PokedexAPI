@@ -1,107 +1,103 @@
 package com.fundatec.vinilemess.pokedex.service.implementation;
 
-import com.fundatec.vinilemess.pokedex.converter.PokemonConverter;
-import com.fundatec.vinilemess.pokedex.domain.Move;
-import com.fundatec.vinilemess.pokedex.domain.Pokemon;
-import com.fundatec.vinilemess.pokedex.domain.Type;
+import com.fundatec.vinilemess.pokedex.client.IPokemonApiClient;
+import com.fundatec.vinilemess.pokedex.dto.request.PokemonRequest;
+import com.fundatec.vinilemess.pokedex.dto.response.PokemonResponse;
+import com.fundatec.vinilemess.pokedex.entity.Pokemon;
 import com.fundatec.vinilemess.pokedex.exception.DuplicatedPokemonException;
 import com.fundatec.vinilemess.pokedex.exception.ExternalAlterationException;
 import com.fundatec.vinilemess.pokedex.exception.PokemonNotFoundException;
-import com.fundatec.vinilemess.pokedex.infra.repository.PokemonRepository;
-import com.fundatec.vinilemess.pokedex.service.IPokemonIntegrationService;
+import com.fundatec.vinilemess.pokedex.mapper.MoveMapper;
+import com.fundatec.vinilemess.pokedex.mapper.PokemonMapper;
+import com.fundatec.vinilemess.pokedex.mapper.TypeMapper;
+import com.fundatec.vinilemess.pokedex.repository.PokemonRepository;
 import com.fundatec.vinilemess.pokedex.service.IPokemonService;
-import com.fundatec.vinilemess.pokedex.service.dto.PokemonDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
-import static com.fundatec.vinilemess.pokedex.converter.PokemonConverter.*;
+import static com.fundatec.vinilemess.pokedex.mapper.PokemonMapper.requestToEntity;
 
 @Service
 public class PokemonService implements IPokemonService {
 
-    private final IPokemonIntegrationService pokemonIntegrationService;
+    public static final String POKEMON = "Pokemon ";
+    private final IPokemonApiClient pokemonApiClient;
     private final PokemonRepository repository;
 
     @Autowired
-    public PokemonService(IPokemonIntegrationService pokemonIntegrationService, PokemonRepository repository) {
-        this.pokemonIntegrationService = pokemonIntegrationService;
+    public PokemonService(IPokemonApiClient pokemonApiClient, PokemonRepository repository) {
+        this.pokemonApiClient = pokemonApiClient;
         this.repository = repository;
     }
 
     @Override
-    public PokemonDTO getPokemonById(Integer id) {
-        try {
-            return responseToDto(pokemonIntegrationService.getPokemonResponseById(id));
-        } catch (PokemonNotFoundException exception) {
-            return entityToDto(repository.findPokemonByPokedexIdAndDeletedFalse(id).orElseThrow(() -> new PokemonNotFoundException("Pokemon " + id)));
-        }
+    public PokemonResponse getPokemonById(Integer id) {
+        return repository.findPokemonByPokedexIdAndDeletedFalse(id)
+                .map(PokemonMapper::entityToResponse)
+                .orElseGet(() -> pokemonApiClient.findPokemonResponseById(id));
     }
 
     @Override
-    public PokemonDTO getPokemonByName(String name) {
-        try {
-            return responseToDto(pokemonIntegrationService.getPokemonResponseByName(name));
-        } catch (PokemonNotFoundException exception) {
-            return entityToDto(repository.findPokemonByNameAndDeletedFalse(name).orElseThrow(() -> new PokemonNotFoundException("Pokemon " + name)));
-        }
+    public PokemonResponse getPokemonByName(String name) {
+        return repository.findPokemonByNameAndDeletedFalse(name)
+                .map(PokemonMapper::entityToResponse)
+                .orElseGet(() -> pokemonApiClient.findPokemonResponseByName(name));
     }
 
     @Override
-    public List<PokemonDTO> getPokemonsByWeight(Integer weight) {
+    public List<PokemonResponse> getPokemonsByWeight(Integer weight) {
         return repository.findPokemonsByWeightGreaterThanAndDeletedFalse(weight)
                 .stream()
-                .map(PokemonConverter::entityToDto)
+                .map(PokemonMapper::entityToResponse)
                 .toList();
     }
 
     @Override
-    public Pokemon registerPokemon(PokemonDTO pokemonDTO) {
-        Pokemon pokemon = dtoToEntity(pokemonDTO);
-        isPokemonDuplicated(pokemon);
+    public Pokemon registerPokemon(PokemonRequest pokemonRequest) {
+        Pokemon pokemon = requestToEntity(pokemonRequest);
+        validatePokemonDuplicated(pokemon);
         return repository.save(pokemon);
     }
 
     @Override
     public void deletePokemon(String name) {
-        if (pokemonIntegrationService.validatePokemonExistenceByName(name))
-            throw new ExternalAlterationException("Cannot delete canonical pokemon!");
-        var pokemon = repository.findPokemonByNameAndDeletedFalse(name).orElseThrow(() -> new PokemonNotFoundException("Pokemon " + name));
+        validateCanonicalPokemon(name);
+        Pokemon pokemon = repository.findPokemonByNameAndDeletedFalse(name)
+                .orElseThrow(() -> new PokemonNotFoundException(POKEMON + name));
         pokemon.markDeleted();
         repository.save(pokemon);
     }
 
     @Override
-    public void updatePokemon(PokemonDTO pokemonDTO) {
-        if (pokemonIntegrationService.validatePokemonExistenceByName(pokemonDTO.getName()))
-            throw new ExternalAlterationException("Cannot update canonical pokemon!");
-        repository.save(generateUpdatedPokemon(pokemonDTO));
+    public void updatePokemon(PokemonRequest pokemonRequest) {
+        validateCanonicalPokemon(pokemonRequest.getName());
+        repository.save(generateUpdatedPokemon(pokemonRequest));
     }
 
-    private Pokemon generateUpdatedPokemon(PokemonDTO pokemonDto) {
-        var presentPokemon = repository
-                .findPokemonByNameAndDeletedFalse(pokemonDto.getName()).orElseThrow(() ->
-                        new PokemonNotFoundException("Pokemon " + pokemonDto.getName()));
-        return new Pokemon(
-                presentPokemon.getId(),
-                presentPokemon.getPokedexId(),
-                presentPokemon.getName(),
-                pokemonDto.getWeight(),
-                pokemonDto.getHeight(),
-                pokemonDto.getMoves()
-                        .stream()
-                        .map(moveDTO -> new Move(moveDTO.getName()))
-                        .toList(),
-                pokemonDto.getTypes()
-                        .stream()
-                        .map(typeDTO -> new Type(typeDTO.getSlot(), typeDTO.getName()))
-                        .toList()
-        );
+    private Pokemon generateUpdatedPokemon(PokemonRequest pokemonRequest) {
+        Pokemon presentPokemon = repository
+                .findPokemonByNameAndDeletedFalse(pokemonRequest.getName()).orElseThrow(() ->
+                        new PokemonNotFoundException(POKEMON + pokemonRequest.getName()));
+        return Pokemon.builder()
+                .id(presentPokemon.getId())
+                .name(presentPokemon.getName())
+                .pokedexId(presentPokemon.getPokedexId())
+                .weight(pokemonRequest.getWeight())
+                .height(pokemonRequest.getHeight())
+                .moves(MoveMapper.requestsToEntities(pokemonRequest.getMoves()))
+                .types(TypeMapper.requestsToEntities(pokemonRequest.getTypes()))
+                .build();
     }
 
-    private void isPokemonDuplicated(Pokemon pokemon) {
-        boolean existsExternally = pokemonIntegrationService.validatePokemonExistenceByName(pokemon.getName());
+    private void validateCanonicalPokemon(String name) {
+        if (pokemonApiClient.validatePokemonExistenceByName(name))
+            throw new ExternalAlterationException("Cannot alterate canonical pokemon!");
+    }
+
+    private void validatePokemonDuplicated(Pokemon pokemon) {
+        boolean existsExternally = pokemonApiClient.validatePokemonExistenceByName(pokemon.getName());
         boolean existsInternally = repository.countPokemonByNameAndDeletedFalseOrPokedexIdAndDeletedFalse(pokemon.getName(), pokemon.getPokedexId()) > 0;
         if (existsExternally || existsInternally) throw new DuplicatedPokemonException("This pokemon already exists!");
     }

@@ -1,4 +1,4 @@
-package com.fundatec.vinilemess.pokedex.service.dto;
+package com.fundatec.vinilemess.pokedex.dto.request;
 
 import lombok.Getter;
 
@@ -7,7 +7,7 @@ import javax.validation.constraints.*;
 import java.util.List;
 
 @Getter
-public class PokemonDTO {
+public class PokemonRequest {
 
     @Positive
     @Min(value = 906)
@@ -25,15 +25,15 @@ public class PokemonDTO {
     private Integer height;
 
     @NotEmpty
-    private List<@Valid MoveDTO> moves;
+    private List<@Valid MoveRequest> moves;
 
     @NotEmpty
     @Size(max = 2)
-    private List<@Valid TypeDTO> types;
+    private List<@Valid TypeRequest> types;
 
-    public PokemonDTO() {}
+    public PokemonRequest() {}
 
-    public PokemonDTO(Integer pokedexId, String name, Integer weight, Integer height, List<MoveDTO> moves, List<TypeDTO> types) {
+    public PokemonRequest(Integer pokedexId, String name, Integer weight, Integer height, List<MoveRequest> moves, List<TypeRequest> types) {
         this.pokedexId = pokedexId;
         this.name = name;
         this.weight = weight;

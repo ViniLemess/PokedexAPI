@@ -1,4 +1,4 @@
-package com.fundatec.vinilemess.pokedex.rest.handler.dto;
+package com.fundatec.vinilemess.pokedex.dto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 

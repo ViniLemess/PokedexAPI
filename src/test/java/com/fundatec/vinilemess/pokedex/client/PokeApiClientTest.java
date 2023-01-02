@@ -1,8 +1,9 @@
-package com.fundatec.vinilemess.pokedex.service.implementation;
+package com.fundatec.vinilemess.pokedex.client;
 
-import com.fundatec.vinilemess.pokedex.client.PokemonIntegrationService;
-import com.fundatec.vinilemess.pokedex.exception.PokemonNotFoundException;
+import com.fundatec.vinilemess.pokedex.client.implementation.PokeApiClient;
 import com.fundatec.vinilemess.pokedex.dto.response.PokemonResponse;
+import com.fundatec.vinilemess.pokedex.exception.PokemonNotFoundException;
+import feign.FeignException;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,44 +14,42 @@ import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
 @ExtendWith(SpringExtension.class)
-class PokemonIntegrationServiceTest {
+class PokeApiClientTest {
 
     @Autowired
-    private PokemonIntegrationService integrationService;
+    private PokeApiClient pokeApiClient;
 
     @Test
     void mustGetPokemonResponseByIdSuccessfully() {
-        var pokemon = integrationService.getPokemonResponseById(1);
+        var pokemon = pokeApiClient.findPokemonResponseById(1);
         assertInstanceOf(PokemonResponse.class, pokemon);
         assertEquals(1, pokemon.getId());
     }
 
     @Test
     void mustValidateGetPokemonResponseByIdWhenNotFound() {
-        Exception exception = assertThrows(PokemonNotFoundException.class, () -> integrationService.getPokemonResponseById(906));
-        assertEquals("Could not found : Pokemon", exception.getMessage());
+        Exception exception = assertThrows(FeignException.NotFound.class, () -> pokeApiClient.findPokemonResponseById(906));
     }
 
     @Test
     void mustGetPokemonResponseByNameSuccessfully() {
-        var pokemon = integrationService.getPokemonResponseByName("pikachu");
+        var pokemon = pokeApiClient.findPokemonResponseByName("pikachu");
         assertInstanceOf(PokemonResponse.class, pokemon);
         assertEquals("pikachu", pokemon.getName());
     }
 
     @Test
     void mustvalidateGetPokemonResponseByNameWhenNotFound() {
-        Exception exception = assertThrows(PokemonNotFoundException.class, () -> integrationService.getPokemonResponseByName("Testemon"));
-        assertEquals("Could not found : Pokemon", exception.getMessage());
+        Exception exception = assertThrows(FeignException.NotFound.class, () -> pokeApiClient.findPokemonResponseByName("Testemon"));
     }
 
     @Test
     void mustReturnTrueWhenValidatePokemonByExistentName() {
-        assertTrue(integrationService.validatePokemonExistenceByName("pikachu"));
+        assertTrue(pokeApiClient.validatePokemonExistenceByName("pikachu"));
     }
 
     @Test
     void mustReturnFalseWhenValidatePokemonByNonexistentName() {
-        assertFalse(integrationService.validatePokemonExistenceByName("Testemon"));
+        assertFalse(pokeApiClient.validatePokemonExistenceByName("Testemon"));
     }
 }

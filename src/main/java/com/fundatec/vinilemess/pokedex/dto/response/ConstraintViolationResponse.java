@@ -1,6 +1,7 @@
-package com.fundatec.vinilemess.pokedex.rest.handler.dto;
+package com.fundatec.vinilemess.pokedex.dto.response;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fundatec.vinilemess.pokedex.dto.ConstraintViolationDTO;
 
 import java.time.LocalDateTime;
 import java.util.List;

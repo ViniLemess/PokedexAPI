@@ -1,4 +1,4 @@
-package com.fundatec.vinilemess.pokedex.service.external;
+package com.fundatec.vinilemess.pokedex.dto.response;
 
 public class MoveDetailsResponse {
     private String name;

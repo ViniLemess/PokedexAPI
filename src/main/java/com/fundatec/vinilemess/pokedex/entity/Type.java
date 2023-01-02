@@ -1,4 +1,4 @@
-package com.fundatec.vinilemess.pokedex.domain;
+package com.fundatec.vinilemess.pokedex.entity;
 
 import org.hibernate.validator.constraints.Range;
 

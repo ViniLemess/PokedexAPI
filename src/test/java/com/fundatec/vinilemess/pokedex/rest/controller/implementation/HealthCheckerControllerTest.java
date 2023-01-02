@@ -1,4 +1,4 @@
-package com.fundatec.vinilemess.pokedex.rest.controller.impl;
+package com.fundatec.vinilemess.pokedex.rest.controller.implementation;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.condition.DisabledOnJre;

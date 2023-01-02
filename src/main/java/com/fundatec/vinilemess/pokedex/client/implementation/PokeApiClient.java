@@ -1,50 +1,64 @@
-package com.fundatec.vinilemess.pokedex.client;
+package com.fundatec.vinilemess.pokedex.client.implementation;
 
-import com.fundatec.vinilemess.pokedex.rest.handler.ExceptionHandlerAdvice;
-import com.fundatec.vinilemess.pokedex.service.IPokemonIntegrationService;
+import com.fundatec.vinilemess.pokedex.client.IPokemonApiClient;
 import com.fundatec.vinilemess.pokedex.dto.response.PokemonResponse;
+import feign.Feign;
+import feign.Logger;
+import feign.jackson.JacksonDecoder;
+import feign.slf4j.Slf4jLogger;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.web.client.RestTemplateBuilder;
+import org.springframework.cloud.openfeign.FeignClient;
+import org.springframework.cloud.openfeign.support.SpringMvcContract;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.RestTemplate;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 
 @Service
-public class PokeApiClient implements IPokemonIntegrationService {
+@Slf4j
+public class PokeApiClient implements IPokemonApiClient {
 
-    @Value("${poke-api-uri}")
-    private String pokeApiUri;
-    private final RestTemplate restTemplate;
+    private final Client feignClient;
 
-    public PokeApiClient(RestTemplateBuilder restTemplateBuilder) {
-        this.restTemplate = restTemplateBuilder
-                .errorHandler(new ExceptionHandlerAdvice())
-                .build();
+    public PokeApiClient(@Value("${poke-api-uri}") String pokeApiUri) {
+        this.feignClient = buildClient(pokeApiUri);
     }
 
-    public PokemonResponse getPokemonResponseById(Integer id) {
-        String uri = generateURLIntegration(id);
-        return restTemplate.getForObject(uri, PokemonResponse.class);
+    public PokemonResponse findPokemonResponseById(Integer id) {
+        log.info("Procurando pokemon externamente por id: {}", id);
+        return feignClient.findPokemonById(id);
     }
 
-    public PokemonResponse getPokemonResponseByName(String name) {
-        String uri = generateURLIntegration(name);
-        return restTemplate.getForObject(uri, PokemonResponse.class);
+    public PokemonResponse findPokemonResponseByName(String name) {
+        log.info("Procurando pokemon externamente por nome: {}", name);
+        return feignClient.findPokemonByName(name);
     }
 
     public boolean validatePokemonExistenceByName(String name) {
-        String uri = generateURLIntegration(name);
         try {
-            restTemplate.getForObject(uri, PokemonResponse.class);
+            feignClient.findPokemonByName(name);
             return true;
         } catch (Exception exception) {
             return false;
         }
     }
 
-    private String generateURLIntegration(Integer id) {
-        return this.pokeApiUri + "/" + id;
+    private Client buildClient(String uri) {
+        return Feign.builder()
+                .decoder(new JacksonDecoder())
+                .contract(new SpringMvcContract())
+                .logger(new Slf4jLogger())
+                .logLevel(Logger.Level.FULL)
+                .target(Client.class, uri);
     }
-    private String generateURLIntegration(String name) {
-        return this.pokeApiUri + "/" + name;
+
+    @FeignClient
+    private interface Client {
+
+        @GetMapping(value = "/{pokemonName}")
+        PokemonResponse findPokemonByName(@PathVariable("pokemonName") String pokemonName);
+
+        @GetMapping(value = "/{pokemonId}")
+        PokemonResponse findPokemonById(@PathVariable("pokemonId") Integer id);
     }
 }

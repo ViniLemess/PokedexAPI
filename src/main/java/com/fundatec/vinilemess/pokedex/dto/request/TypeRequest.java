@@ -1,4 +1,4 @@
-package com.fundatec.vinilemess.pokedex.service.dto;
+package com.fundatec.vinilemess.pokedex.dto.request;
 
 import lombok.Getter;
 import org.hibernate.validator.constraints.Range;
@@ -8,7 +8,7 @@ import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Positive;
 
 @Getter
-public class TypeDTO {
+public class TypeRequest {
 
     @Positive
     @Range(min = 1, max = 2)
@@ -18,9 +18,9 @@ public class TypeDTO {
     @NotBlank
     private String name;
 
-    public TypeDTO() {}
+    public TypeRequest() {}
 
-    public TypeDTO(Integer slot, String name) {
+    public TypeRequest(Integer slot, String name) {
         this.slot = slot;
         this.name = name;
     }

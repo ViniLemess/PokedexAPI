@@ -1,4 +1,4 @@
-package com.fundatec.vinilemess.pokedex.infra.config;
+package com.fundatec.vinilemess.pokedex.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
