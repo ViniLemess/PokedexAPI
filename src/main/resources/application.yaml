@@ -10,6 +10,9 @@ spring:
       username: ${MONGODB_USERNAME}
       password: ${MONGODB_PASSWORD}
       authentication-database: admin
-      host: spring-data-mongo-db
+      host: localhost
       port: 27017
       database: pokedex_db
+  mvc:
+    pathmatch:
+      matching-strategy: ANT_PATH_MATCHER
