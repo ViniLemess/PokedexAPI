@@ -1,133 +1,239 @@
 package com.fundatec.vinilemess.pokedex.rest.controller.implementation;
 
-import org.junit.jupiter.api.AfterAll;
+import com.fundatec.vinilemess.pokedex.dto.request.PokemonRequest;
+import com.fundatec.vinilemess.pokedex.exception.ExternalAlterationException;
+import com.fundatec.vinilemess.pokedex.exception.PokemonNotFoundException;
+import com.fundatec.vinilemess.pokedex.service.implementation.PokemonService;
+import com.fundatec.vinilemess.pokedex.stubs.PokemonStub;
+import io.restassured.RestAssured;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.condition.DisabledOnJre;
-import org.junit.jupiter.api.condition.JRE;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mockito;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.boot.test.web.server.LocalServerPort;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import static io.restassured.RestAssured.*;
 import static org.hamcrest.Matchers.*;
 
-@DisabledOnJre(JRE.JAVA_17)
+@AutoConfigureMockMvc
+@ExtendWith(SpringExtension.class)
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 class PokemonControllerTest {
 
-    @Test
-    void givenValidId_mustGetPokemon_withStatus200() {
-        get("http://localhost:8081/api/v1/pokemon/132")
-                .then()
-                .statusCode(200)
-                .body(equalTo("{\"pokedexId\":132,\"name\":\"ditto\",\"weight\":3,\"height\":40,\"moves\":[{\"name\":\"transform\"}],\"types\":[{\"slot\":1,\"name\":\"normal\"}]}"));
+    @LocalServerPort
+    private int port;
+    private static final String HTTP_CONTEXT_PATH = "/api/v2";
+    @MockBean
+    PokemonService pokemonService;
+
+    @BeforeEach
+    public void setUp() {
+        RestAssured.port = port;
     }
 
-    @Test
-    void givenNonexistentId_mustGetPokemon_withStatus404() {
-        get("http://localhost:8081/api/v1/pokemon/100000")
-                .then()
-                .statusCode(404);
+    @Nested
+    @DisplayName("When call method [getPokemonById()]...")
+    class GetPokemonByIdTest {
+
+        @Test
+        @DisplayName("Must return ditto response with status code 200")
+        void getPokemonWithStatus200() {
+            Mockito.when(pokemonService.getPokemonById(132)).thenReturn(PokemonStub.createCanonicalResponseStub());
+            get(HTTP_CONTEXT_PATH + "/pokemon/{id}", 132)
+                    .then()
+                    .statusCode(200)
+                    .body(equalTo("{\"id\":132,\"name\":\"ditto\",\"height\":3,\"weight\":40,\"moves\":[{\"move\":{\"name\":\"transform\"}}],\"types\":[{\"slot\":1,\"type\":{\"name\":\"normal\"}}]}"));
+        }
+
+        @Test
+        @DisplayName("Must return not found message response with status code 404")
+        void getPokemonWithStatus404() {
+            Mockito.when(pokemonService.getPokemonById(100000)).thenThrow(new PokemonNotFoundException("pokemon 100000"));
+            get(HTTP_CONTEXT_PATH + "/pokemon/{id}", 100000)
+                    .then()
+                    .statusCode(404)
+                    .body(containsString("Could not found : pokemon 100000"));
+        }
     }
 
-    @Test
-    void givenValidName_mustGetPokemon_withStatus200() {
-        get("http://localhost:8081/api/v1/pokemon/name/ditto")
-                .then()
-                .statusCode(200)
-                .body(equalTo("{\"pokedexId\":132,\"name\":\"ditto\",\"weight\":3,\"height\":40,\"moves\":[{\"name\":\"transform\"}],\"types\":[{\"slot\":1,\"name\":\"normal\"}]}"));
+    @Nested
+    @DisplayName("When call method [getPokemonByName()]...")
+    class GetPokemonByNameTest {
+
+        @Test
+        @DisplayName("Must return ditto response with status code 200")
+        void getPokemonWithStatus200() {
+            Mockito.when(pokemonService.getPokemonByName("ditto")).thenReturn(PokemonStub.createCanonicalResponseStub());
+            get(HTTP_CONTEXT_PATH + "/pokemon/name/{name}", "ditto")
+                    .then()
+                    .statusCode(200)
+                    .body(equalTo("{\"id\":132,\"name\":\"ditto\",\"height\":3,\"weight\":40,\"moves\":[{\"move\":{\"name\":\"transform\"}}],\"types\":[{\"slot\":1,\"type\":{\"name\":\"normal\"}}]}"));
+        }
+
+        @Test
+        @DisplayName("Must return not found message response with status code 404")
+        void getPokemonWithStatus404() {
+            Mockito.when(pokemonService.getPokemonByName(Mockito.anyString())).thenThrow(new PokemonNotFoundException("pokemon nonexistentmon"));
+            get(HTTP_CONTEXT_PATH + "/pokemon/name/{name}", "nonexistentmon")
+                    .then()
+                    .statusCode(404)
+                    .body(containsString("Could not found : pokemon nonexistentmon"));
+        }
     }
 
-    @Test
-    void givenNonexistentName_mustGetPokemon_withStatus404() {
-        get("http://localhost:8081/api/v1/pokemon/name/nonexistentmon")
-                .then()
-                .statusCode(404);
+    @Nested
+    @DisplayName("When call method [registerPokemon()]...")
+    class RegisterPokemonTest {
+
+        @Test
+        @DisplayName("Must return status code 201")
+        void postPokemonWithStatus201() {
+            Mockito.when(pokemonService.registerPokemon(Mockito.any(PokemonRequest.class))).thenReturn(PokemonStub.createFakemonStub());
+
+            String requestBody = """
+                {
+                  "height": 1,
+                  "pokedexId": 1051,
+                  "name": "Salenmon",
+                  "weight": 5,
+                  "moves": [
+                      {
+                          "name": "Bite"
+                      },
+                      {
+                          "name": "Pursuit"
+                      }
+                  ],
+                  "types": [
+                      {
+                          "slot": 1,
+                          "name": "dark"
+                      }
+                  ]
+                }""";
+
+            given()
+                    .header("Content-type", "application/json")
+                    .and()
+                    .body(requestBody)
+                    .when()
+                    .post(HTTP_CONTEXT_PATH + "/pokemon")
+                    .then()
+                    .statusCode(201);
+        }
     }
 
-    @Test
-    void givenValidBody_mustPostPokemon_withStatus201() {
-        String requestBody = "{\n" +
-                "  \"height\": 1,\n" +
-                "  \"pokedexId\": 1051,\n" +
-                "  \"name\": \"Salenmon\",\n" +
-                "  \"weight\": 5,\n" +
-                "  \"moves\": [\n" +
-                "      {\n" +
-                "          \"name\": \"Bite\"\n" +
-                "      },\n" +
-                "      {\n" +
-                "          \"name\": \"Pursuit\"\n" +
-                "      }\n" +
-                "  ],\n" +
-                "  \"types\": [\n" +
-                "      {\n" +
-                "          \"slot\": 1,\n" +
-                "          \"name\": \"dark\"\n" +
-                "      }\n" +
-                "  ]\n" +
-                "}";
+    @Nested
+    @DisplayName("When call method (updatePokemon()]...")
+    class UpdatePokemonTest {
 
-        given()
-                .header("Content-type", "application/json")
-                .and()
-                .body(requestBody)
-                .when()
-                .post("http://localhost:8081/api/v1/pokemon")
-                .then()
-                .statusCode(201);
+        @Test
+        @DisplayName("With valid body must return status code 200")
+        void putPokemonTestWithStatus200() {
+            Mockito.doNothing().when(pokemonService).updatePokemon(Mockito.any(PokemonRequest.class));
+
+            String requestBody = """
+                {
+                  "height": 20,
+                  "pokedexId": 1050,
+                  "name": "fecha",
+                  "weight": 50,
+                  "moves": [
+                      {
+                          "name": "Psybeam"
+                      },
+                      {
+                          "name": "Psychic"
+                      }
+                  ],
+                  "types": [
+                      {
+                          "slot": 1,
+                          "name": "psychic"
+                      }
+                  ]
+                }""";
+
+            given()
+                    .header("Content-type", "application/json")
+                    .and()
+                    .body(requestBody)
+                    .when()
+                    .put(HTTP_CONTEXT_PATH + "/pokemon")
+                    .then()
+                    .statusCode(200);
+        }
+
+        @Test
+        @DisplayName("With valid body must return status code 403")
+        void putPokemonTestWithStatus403() {
+            Mockito.doThrow(ExternalAlterationException.class).when(pokemonService).updatePokemon(Mockito.any(PokemonRequest.class));
+
+            String requestBody = """
+                {
+                  "height": 3,
+                  "pokedexId": 132,
+                  "name": "ditto",
+                  "weight": 40,
+                  "moves": [
+                      {
+                          "name": "transform"
+                      }
+                  ],
+                  "types": [
+                      {
+                          "slot": 1,
+                          "name": "normal"
+                      }
+                  ]
+                }""";
+
+            given()
+                    .header("Content-type", "application/json")
+                    .and()
+                    .body(requestBody)
+                    .when()
+                    .put(HTTP_CONTEXT_PATH + "/pokemon")
+                    .then()
+                    .statusCode(403);
+        }
     }
 
-    @Test
-    void givenValidBody_mustPutPokemon_withStatus200() {
-        String requestBody = "{\n" +
-                "    \"pokedexId\": 1050,\n" +
-                "    \"name\": \"fecha\",\n" +
-                "    \"weight\": 20,\n" +
-                "    \"height\": 30,\n" +
-                "    \"moves\": [\n" +
-                "        {\n" +
-                "            \"name\": \"Psybeam\"\n" +
-                "        },\n" +
-                "        {\n" +
-                "            \"name\": \"Psychic\"\n" +
-                "        },\n" +
-                "        {\n" +
-                "            \"name\": \"Confusion\"\n" +
-                "        }\n" +
-                "    ],\n" +
-                "    \"types\": [\n" +
-                "        {\n" +
-                "            \"slot\": 1,\n" +
-                "            \"name\": \"psychic\"\n" +
-                "        }\n" +
-                "    ]\n" +
-                "}";
+    @Nested
+    @DisplayName("When call method [deletePokemon()]...")
+    class DeletePokemonTest {
 
-        given()
-                .header("Content-type", "application/json")
-                .and()
-                .body(requestBody)
-                .when()
-                .put("http://localhost:8081/api/v1/pokemon")
-                .then()
-                .statusCode(200);
-    }
+        @Test
+        @DisplayName("With fakemon name must return status code 200")
+        void deletePokemonWithStatus200() {
+            Mockito.doNothing().when(pokemonService).deletePokemon(Mockito.anyString());
+            delete(HTTP_CONTEXT_PATH + "/pokemon/{name}", "testemon")
+                    .then()
+                    .statusCode(200);
+        }
 
-    @Test
-    void givenNonexistentName_mustDeletePokemon_withStatus404() {
-        delete("http://localhost:8081/api/v1/pokemon/nonexistentmon")
-                .then()
-                .statusCode(404);
-    }
+        @Test
+        @DisplayName("With nonexistent pokemon name must return status code 404")
+        void deletePokemonWithStatus404() {
+            Mockito.doThrow(PokemonNotFoundException.class).when(pokemonService).deletePokemon(Mockito.anyString());
+            delete(HTTP_CONTEXT_PATH + "/pokemon/{name}", "nonexistentmon")
+                    .then()
+                    .statusCode(404);
+        }
 
-    @Test
-    void givenCanonicalPokemonName_mustDeletePokemon_withStatus403() {
-        delete("http://localhost:8081/api/v1/pokemon/pikachu")
-                .then()
-                .statusCode(403);
-    }
-
-    @AfterAll
-    static void deletePokemon() {
-        delete("http://localhost:8081/api/v1/pokemon/Salenmon")
-                .then()
-                .statusCode(200);
+        @Test
+        @DisplayName("With canonical pokemon name must return status code 403")
+        void deletePokemonWithStatus403() {
+            Mockito.doThrow(ExternalAlterationException.class).when(pokemonService).deletePokemon(Mockito.anyString());
+            delete(HTTP_CONTEXT_PATH + "/pokemon/{name}", "pikachu")
+                    .then()
+                    .statusCode(403);
+        }
     }
 }
