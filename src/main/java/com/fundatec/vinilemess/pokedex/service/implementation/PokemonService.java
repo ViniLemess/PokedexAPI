@@ -62,7 +62,7 @@ public class PokemonService implements IPokemonService {
         Pokemon pokemon = requestToEntity(pokemonRequest);
 
         return repository.save(findDeletedPokemon(pokemon)
-                .map(mapToRestoredPokemon())
+                .map(mapToRestoredPokemon(pokemon))
                 .orElseGet(saveNewPokemon(pokemon)));
     }
 
@@ -81,9 +81,13 @@ public class PokemonService implements IPokemonService {
         repository.save(generateUpdatedPokemon(pokemonRequest));
     }
 
-    private Function<Pokemon, Pokemon> mapToRestoredPokemon() {
+    private Function<Pokemon, Pokemon> mapToRestoredPokemon(Pokemon pokemon) {
         return restoredPokemon -> {
             restoredPokemon.restorePokemon();
+            restoredPokemon.setHeight(pokemon.getHeight());
+            restoredPokemon.setWeight(pokemon.getWeight());
+            restoredPokemon.setTypes(pokemon.getTypes());
+            restoredPokemon.setMoves(pokemon.getMoves());
             return restoredPokemon;
         };
     }

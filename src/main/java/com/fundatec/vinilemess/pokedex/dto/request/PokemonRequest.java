@@ -10,7 +10,6 @@ import java.util.List;
 public class PokemonRequest {
 
     @Positive
-    @Min(value = 906)
     private Integer pokedexId;
 
     @NotBlank

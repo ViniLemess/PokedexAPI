@@ -2,6 +2,7 @@ package com.fundatec.vinilemess.pokedex.entity;
 
 import lombok.Builder;
 import lombok.Getter;
+import lombok.Setter;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 import java.util.List;
@@ -11,11 +12,21 @@ import java.util.List;
 public class Pokemon {
     @Id
     private String id;
+
     private Integer pokedexId;
+
     private String name;
+
+    @Setter
     private Integer weight;
+
+    @Setter
     private Integer height;
+
+    @Setter
     private List<Move> moves;
+
+    @Setter
     private List<Type> types;
 
     private boolean deleted = false;
